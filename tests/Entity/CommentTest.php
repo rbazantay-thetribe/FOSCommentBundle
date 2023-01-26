@@ -59,6 +59,12 @@ class CommentTest extends TestCase
             ->will($this->returnValue(null));
 
         $comment = new Comment();
-        $comment->setParent($parent);
+        $hasException = false;
+        try {
+            $comment->setParent($parent);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 }

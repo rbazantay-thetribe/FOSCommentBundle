@@ -10,17 +10,12 @@
  */
 
 return [
-    new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-
-    new Symfony\Bundle\SecurityBundle\SecurityBundle(),
-    new Symfony\Bundle\TwigBundle\TwigBundle(),
-
-    new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-
-    new FOS\RestBundle\FOSRestBundle(),
-    new FOS\CommentBundle\FOSCommentBundle(),
-
-    new JMS\SerializerBundle\JMSSerializerBundle($this),
-
-    new FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\CommentBundle(),
+    \Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
+    \Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
+    \Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
+    \Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
+    \FOS\RestBundle\FOSRestBundle::class => ['all' => true],
+    \FOS\CommentBundle\FOSCommentBundle::class => ['all' => true],
+    \JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
+    \FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\CommentBundle::class => ['all' => true]
 ];

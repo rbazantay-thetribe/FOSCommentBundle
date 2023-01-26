@@ -11,11 +11,13 @@
 
 namespace FOS\CommentBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\RouteCollectionBuilder;
 
-// get the autoload file
 $dir = __DIR__;
 $lastDir = null;
 while ($dir !== $lastDir) {
@@ -38,56 +40,79 @@ while ($dir !== $lastDir) {
 
     $dir = dirname($dir);
 }
-
 class AppKernel extends Kernel
 {
+    use MicroKernelTrait;
+
+    private const CONFIG_EXTS = '.{php,xml,yaml,yml}';
     private $testCase;
     private $rootConfig;
 
-    public function __construct($testCase, $rootConfig, $environment, $debug)
-    {
-        if (!is_dir(__DIR__.'/'.$testCase)) {
+    public function __construct(
+        $environment,
+        $debug,
+        $testCase = 'Basic',
+        $rootConfig = 'config.yml"'
+    ) {
+        $root = strpos(__DIR__, '/app') !== false ? __DIR__ : __DIR__ . '/app';
+        if (!is_dir($root.'/'.$testCase)) {
             throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
         }
         $this->testCase = $testCase;
-
-        $fs = new Filesystem();
-        if (!$fs->isAbsolutePath($rootConfig) && !is_file($rootConfig = __DIR__.'/'.$testCase.'/'.$rootConfig)) {
-            throw new \InvalidArgumentException(sprintf('The root config "%s" does not exist.', $rootConfig));
-        }
-        $this->rootConfig = $rootConfig;
+        $this->rootConfig = $root.'/'.$testCase.'/'.$rootConfig;
 
         parent::__construct($environment, $debug);
     }
 
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         if (!is_file($filename = $this->getRootDir().'/'.$this->testCase.'/bundles.php')) {
             throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
         }
-
-        return include $filename;
+        $contents = require $this->getRootDir().'/'.$this->testCase.'/bundles.php';
+        foreach ($contents as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
     }
 
-    public function getRootDir()
+    protected function configureRoutes(RouteCollectionBuilder $routes): void
     {
-        return __DIR__;
+        $confDir = $this->getProjectDir() . '/' . $this->testCase;
+        $routes->import($confDir . '/{routing}' . self::CONFIG_EXTS, '/', 'glob');
+
+      //  dd($routes);
     }
 
-    public function getCacheDir()
+    public function getProjectDir(): string
     {
-        return sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$this->testCase.'/cache/'.$this->environment;
+        $path = \dirname(__DIR__);
+        return strpos($path, '/app') ? $path : $path . '/app';
     }
 
-    public function getLogDir()
+    public function getRootDir(): string
     {
-        return sys_get_temp_dir().'/'.Kernel::VERSION.'/'.$this->testCase.'/logs';
+        $path = \dirname(__DIR__);
+        return strpos($path, '/app') ? $path : $path . '/app';
     }
 
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function getCacheDir(): string
     {
-        $loader->load($this->rootConfig);
+        return sys_get_temp_dir().'/'.time().'/'.Kernel::VERSION.'/'.$this->testCase.'/cache/'.$this->environment;
+    }
 
+    public function getLogDir(): string
+    {
+        return sys_get_temp_dir().'/'.time().'/'.Kernel::VERSION.'/'.$this->testCase.'/logs';
+    }
+
+    public function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
+    {
+        $container->addResource(new FileResource($this->getRootDir().'/'.$this->testCase.'/bundles.php'));
+        $container->setParameter('container.dumper.inline_class_loader', \PHP_VERSION_ID < 70400 || $this->debug);
+        $container->setParameter('container.dumper.inline_factories', true);
+        $loader->load($this->getRootDir().'/'.$this->testCase. '/config' . self::CONFIG_EXTS, 'glob');
         if (Kernel::MAJOR_VERSION >= 4 && Kernel::MINOR_VERSION >= 1) {
             $loader->load(__DIR__.'/config/twig.yml');
         }
@@ -103,7 +128,7 @@ class AppKernel extends Kernel
         call_user_func_array([$this, '__construct'], unserialize($str));
     }
 
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();
         $parameters['kernel.test_case'] = $this->testCase;

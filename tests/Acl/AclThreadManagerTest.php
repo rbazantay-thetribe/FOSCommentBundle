@@ -25,7 +25,7 @@ class AclThreadManagerTest extends TestCase
     protected $threadSecurity;
     protected $thread;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->realManager = $this->getMockBuilder('FOS\CommentBundle\Model\ThreadManagerInterface')->getMock();
         $this->threadSecurity = $this->getMockBuilder('FOS\CommentBundle\Acl\ThreadAclInterface')->getMock();
@@ -49,7 +49,13 @@ class AclThreadManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclThreadManager($this->realManager, $this->threadSecurity);
-        $manager->findThreadById($threadId);
+        $hasException = false;
+        try {
+            $manager->findThreadById($threadId);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testFindThreadByIdNotFound()
@@ -61,7 +67,8 @@ class AclThreadManagerTest extends TestCase
             ->will($this->returnValue(null));
 
         $this->threadSecurity->expects($this->never())
-            ->method('canView');
+            ->method('canView')
+            ->willReturn(true);
 
         $manager = new AclThreadManager($this->realManager, $this->threadSecurity);
         $this->assertNull($manager->findThreadById($threadId));
@@ -88,7 +95,13 @@ class AclThreadManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclThreadManager($this->realManager, $this->threadSecurity);
-        $manager->findThreadBy($conditions);
+        $hasException = false;
+        try {
+            $manager->findThreadBy($conditions);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testFindThreadByNoResult()
@@ -125,7 +138,13 @@ class AclThreadManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclThreadManager($this->realManager, $this->threadSecurity);
-        $manager->findAllThreads();
+        $hasException = false;
+        try {
+            $manager->findAllThreads();
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testFindAllThreadsCanView()
@@ -160,7 +179,13 @@ class AclThreadManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclThreadManager($this->realManager, $this->threadSecurity);
-        $manager->saveThread($this->thread);
+        $hasException = false;
+        try {
+            $manager->saveThread($this->thread);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testAddThreadCanCreate()

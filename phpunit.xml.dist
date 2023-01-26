@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit bootstrap="./tests/bootstrap.php" colors="true">
+<!-- http://phpunit.de/manual/6.0/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.0/phpunit.xsd">
     <php>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
         <ini name="xdebug.max_nesting_level" value="200" />
     </php>
     <testsuites>

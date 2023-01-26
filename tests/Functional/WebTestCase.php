@@ -12,7 +12,12 @@
 namespace FOS\CommentBundle\Tests\Functional;
 
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ObjectManager;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestAssertionsTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Base Functional test case. Inspired (copied) from FrameworkBundle and SecurityBundle's
@@ -20,18 +25,19 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
  */
 class WebTestCase extends BaseWebTestCase
 {
+    use WebTestAssertionsTrait;
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var ObjectManager
      */
     protected $em;
     protected static $schemaSetUp = false;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Client
+     * @var AbstractBrowser
      */
     protected $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!class_exists('Twig\Environment')) {
             $this->markTestSkipped('Twig is not available.');
@@ -52,6 +58,72 @@ class WebTestCase extends BaseWebTestCase
         }
 
         parent::setUp();
+    }
+
+    protected static function createClient(array $options = [], array $server = [])
+    {
+        if (static::$booted) {
+            throw new \LogicException(sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
+        }
+        $kernel = self::bootKernel($options);
+
+        try {
+            $client = $kernel->getContainer()->get('test.client');
+        } catch (ServiceNotFoundException $e) {
+            if (class_exists(KernelBrowser::class)) {
+                throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
+            }
+            throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit component is not available. Try running "composer require symfony/browser-kit".');
+        }
+
+        $client->setServerParameters($server);
+
+        return $client;
+    }
+
+    protected static function bootKernel(array $options = [])
+    {
+        static::ensureKernelShutdown();
+
+        $kernel = static::createKernel($options);
+        $kernel->boot();
+        static::$kernel = $kernel;
+        static::$booted = true;
+
+        $container = static::$kernel->getContainer();
+        static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
+
+        return static::$kernel;
+    }
+    protected static function createKernel(array $options = [])
+    {
+
+        if (null === static::$class) {
+            static::$class = static::getKernelClass();
+        }
+        if (isset($options['environment'])) {
+            $env = $options['environment'];
+        } elseif (isset($_ENV['APP_ENV'])) {
+            $env = $_ENV['APP_ENV'];
+        } elseif (isset($_SERVER['APP_ENV'])) {
+            $env = $_SERVER['APP_ENV'];
+        } else {
+            $env = 'test';
+        }
+
+        if (isset($options['debug'])) {
+            $debug = $options['debug'];
+        } elseif (isset($_ENV['APP_DEBUG'])) {
+            $debug = $_ENV['APP_DEBUG'];
+        } elseif (isset($_SERVER['APP_DEBUG'])) {
+            $debug = $_SERVER['APP_DEBUG'];
+        } else {
+            $debug = true;
+        }
+
+        $testCase = $options['test_case'];
+        $rootConfig = $options['root_config'];
+        return new static::$class($env, $debug, $testCase, $rootConfig);
     }
 
     public static function assertRedirect($response, $location)
@@ -75,21 +147,5 @@ class WebTestCase extends BaseWebTestCase
         require_once __DIR__.'/app/AppKernel.php';
 
         return 'FOS\\CommentBundle\\Tests\\Functional\\AppKernel';
-    }
-
-    protected static function createKernel(array $options = [])
-    {
-        $class = self::getKernelClass();
-
-        if (!isset($options['test_case'])) {
-            throw new \InvalidArgumentException('The option "test_case" must be set.');
-        }
-
-        return new $class(
-            $options['test_case'],
-            isset($options['root_config']) ? $options['root_config'] : 'config.yml',
-            isset($options['environment']) ? $options['environment'] : 'foscommenttest',
-            isset($options['debug']) ? $options['debug'] : true
-        );
     }
 }

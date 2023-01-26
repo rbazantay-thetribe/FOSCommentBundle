@@ -2,14 +2,16 @@ framework:
     secret: test
     test: ~
     session:
-        storage_id: session.storage.filesystem
+        handler_id: ~
+        storage_id: session.storage.mock_file
+        name: MOCKSESSID
     form:            true
     csrf_protection: false
     validation:
         enabled: true
         enable_annotations: true
     router:
-        resource: '%kernel.root_dir%/%kernel.test_case%/routing.yml'
+        utf8: true
     translator:
         enabled: false
 
@@ -18,10 +20,13 @@ doctrine:
         driver:   pdo_sqlite
         path:     '%kernel.cache_dir%/db.sqlite'
         charset:  UTF8
-
     orm:
-        auto_generate_proxy_classes: '%kernel.debug%'
-        auto_mapping: true
+        default_entity_manager: default
+        auto_generate_proxy_classes: "%kernel.debug%"
+        entity_managers:
+            default:
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                auto_mapping: true
 
 security:
     providers:

@@ -13,7 +13,10 @@ namespace FOS\CommentBundle\Controller;
 
 use FOS\CommentBundle\Model\CommentInterface;
 use FOS\CommentBundle\Model\ThreadInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,15 +29,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Alexander <iam.asm89@gmail.com>
  */
-class ThreadController extends AbstractController
+class ThreadController extends AbstractFOSRestController
 {
+    const ERROR = "Thread with id '%s' could not be found.";
     const VIEW_FLAT = 'flat';
     const VIEW_TREE = 'tree';
 
     /**
      * Presents the form to use to create a new Thread.
      *
-     * @return View
+     * @return Response
      */
     public function newThreadsAction()
     {
@@ -46,10 +50,9 @@ class ThreadController extends AbstractController
                     'form' => $form->createView(),
                 ],
                 'template' => '@FOSComment/Thread/new.html.twig',
-            ]
-        );
+            ]);
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -57,21 +60,22 @@ class ThreadController extends AbstractController
      *
      * @param string $id
      *
-     * @return View
+     * @return Response
      */
     public function getThreadAction($id)
     {
+
         $manager = $this->container->get('fos_comment.manager.thread');
         $thread = $manager->findThreadById($id);
 
         if (null === $thread) {
-            throw new NotFoundHttpException(sprintf("Thread with id '%s' could not be found.", $id));
+            throw new NotFoundHttpException(sprintf(self::ERROR, $id));
         }
 
         $view = View::create()
             ->setData(['thread' => $thread]);
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -79,7 +83,7 @@ class ThreadController extends AbstractController
      *
      * @param Request $request
      *
-     * @return View
+     * @return Response
      */
     public function getThreadsActions(Request $request)
     {
@@ -94,7 +98,7 @@ class ThreadController extends AbstractController
         $view = View::create()
             ->setData(['threads' => $threads]);
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -102,7 +106,7 @@ class ThreadController extends AbstractController
      *
      * @param Request $request The current request
      *
-     * @return View
+     * @return Response
      */
     public function postThreadsAction(Request $request)
     {
@@ -120,10 +124,10 @@ class ThreadController extends AbstractController
             // Add the thread
             $threadManager->saveThread($thread);
 
-            return $this->getViewHandler()->handle($this->onCreateThreadSuccess($form));
+            return $this->handleView($this->onCreateThreadSuccess($form));
         }
 
-        return $this->getViewHandler()->handle($this->onCreateThreadError($form));
+        return $this->handleView($this->onCreateThreadError($form));
     }
 
     /**
@@ -132,7 +136,7 @@ class ThreadController extends AbstractController
      * @param Request $request Current request
      * @param mixed   $id      Thread id
      *
-     * @return View
+     * @return Response
      */
     public function editThreadCommentableAction(Request $request, $id)
     {
@@ -140,7 +144,7 @@ class ThreadController extends AbstractController
         $thread = $manager->findThreadById($id);
 
         if (null === $thread) {
-            throw new NotFoundHttpException(sprintf("Thread with id '%s' could not be found.", $id));
+            throw new NotFoundHttpException(sprintf(self::ERROR, $id));
         }
 
         $thread->setCommentable($request->query->get('value', 1));
@@ -159,7 +163,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -168,7 +172,7 @@ class ThreadController extends AbstractController
      * @param Request $request Currently request
      * @param mixed   $id      Thread id
      *
-     * @return View
+     * @return Response
      */
     public function patchThreadCommentableAction(Request $request, $id)
     {
@@ -176,7 +180,7 @@ class ThreadController extends AbstractController
         $thread = $manager->findThreadById($id);
 
         if (null === $thread) {
-            throw new NotFoundHttpException(sprintf("Thread with id '%s' could not be found.", $id));
+            throw new NotFoundHttpException(sprintf(self::ERROR, $id));
         }
 
         $form = $this->container->get('fos_comment.form_factory.commentable_thread')->createForm();
@@ -186,10 +190,10 @@ class ThreadController extends AbstractController
         if ($form->isValid()) {
             $manager->saveThread($thread);
 
-            return $this->getViewHandler()->handle($this->onOpenThreadSuccess($form));
+            return $this->handleView($this->onOpenThreadSuccess($form));
         }
 
-        return $this->getViewHandler()->handle($this->onOpenThreadError($form));
+        return $this->handleView($this->onOpenThreadError($form));
     }
 
     /**
@@ -198,7 +202,7 @@ class ThreadController extends AbstractController
      * @param Request $request
      * @param string  $id
      *
-     * @return View
+     * @return Response
      */
     public function newThreadCommentsAction(Request $request, $id)
     {
@@ -227,7 +231,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -236,7 +240,7 @@ class ThreadController extends AbstractController
      * @param string $id        Id of the thread
      * @param mixed  $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function getThreadCommentAction($id, $commentId)
     {
@@ -265,7 +269,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -275,7 +279,7 @@ class ThreadController extends AbstractController
      * @param string  $id        Id of the thread
      * @param mixed   $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function removeThreadCommentAction(Request $request, $id, $commentId)
     {
@@ -302,7 +306,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -312,7 +316,7 @@ class ThreadController extends AbstractController
      * @param mixed   $id        Thread id
      * @param mixed   $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function patchThreadCommentStateAction(Request $request, $id, $commentId)
     {
@@ -334,7 +338,7 @@ class ThreadController extends AbstractController
             }
         }
 
-        return $this->getViewHandler()->handle($this->onRemoveThreadCommentError($form, $id));
+        return $this->handleView($this->onRemoveThreadCommentError($form, $id));
     }
 
     /**
@@ -343,7 +347,7 @@ class ThreadController extends AbstractController
      * @param string $id        Id of the thread
      * @param mixed  $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function editThreadCommentAction($id, $commentId)
     {
@@ -367,7 +371,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -377,7 +381,7 @@ class ThreadController extends AbstractController
      * @param string  $id        Id of the thread
      * @param mixed   $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function putThreadCommentsAction(Request $request, $id, $commentId)
     {
@@ -400,7 +404,7 @@ class ThreadController extends AbstractController
             }
         }
 
-        return $this->getViewHandler()->handle($this->onEditCommentError($form, $id, $comment->getParent()));
+        return $this->handleView($this->onEditCommentError($form, $id, $comment->getParent()));
     }
 
     /**
@@ -409,9 +413,8 @@ class ThreadController extends AbstractController
      * @param Request $request Current request
      * @param string  $id      Id of the thread
      *
-     * @return View
+     * @return Response
      *
-     * @todo Add support page/pagesize/sorting/tree-depth parameters
      */
     public function getThreadCommentsAction(Request $request, $id)
     {
@@ -441,7 +444,7 @@ class ThreadController extends AbstractController
                     ]
                 );
 
-                return $this->getViewHandler()->handle($view);
+                return $this->handleView($view);
             }
 
             // Decode the permalink for cleaner storage (it is encoded on the client side)
@@ -496,7 +499,7 @@ class ThreadController extends AbstractController
             $this->get('fos_rest.view_handler')->registerHandler('rss', $templatingHandler);
         }
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -505,7 +508,7 @@ class ThreadController extends AbstractController
      * @param Request $request The current request
      * @param string  $id      The id of the thread
      *
-     * @return View
+     * @return Response
      *
      * @todo Add support for comment parent (in form?)
      */
@@ -530,11 +533,11 @@ class ThreadController extends AbstractController
 
         if ($form->isValid()) {
             if (false !== $commentManager->saveComment($comment)) {
-                return $this->getViewHandler()->handle($this->onCreateCommentSuccess($form, $id, $parent));
+                return $this->handleView($this->onCreateCommentSuccess($form, $id, $parent));
             }
         }
 
-        return $this->getViewHandler()->handle($this->onCreateCommentError($form, $id, $parent));
+        return $this->handleView($this->onCreateCommentError($form, $id, $parent));
     }
 
     /**
@@ -543,7 +546,7 @@ class ThreadController extends AbstractController
      * @param string $id        Id of the thread
      * @param mixed  $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function getThreadCommentVotesAction($id, $commentId)
     {
@@ -563,7 +566,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -573,7 +576,7 @@ class ThreadController extends AbstractController
      * @param string  $id        Id of the thread
      * @param mixed   $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function newThreadCommentVotesAction(Request $request, $id, $commentId)
     {
@@ -601,7 +604,7 @@ class ThreadController extends AbstractController
             ]
         );
 
-        return $this->getViewHandler()->handle($view);
+        return $this->handleView($view);
     }
 
     /**
@@ -611,7 +614,7 @@ class ThreadController extends AbstractController
      * @param string  $id        Id of the thread
      * @param mixed   $commentId Id of the comment
      *
-     * @return View
+     * @return Response
      */
     public function postThreadCommentVotesAction(Request $request, $id, $commentId)
     {
@@ -632,32 +635,36 @@ class ThreadController extends AbstractController
         if ($form->isValid()) {
             $voteManager->saveVote($vote);
 
-            return $this->getViewHandler()->handle($this->onCreateVoteSuccess($form, $id, $commentId));
+            return $this->handleView($this->onCreateVoteSuccess($form, $id, $commentId));
         }
 
-        return $this->getViewHandler()->handle($this->onCreateVoteError($form, $id, $commentId));
+        return $this->handleView($this->onCreateVoteError($form, $id, $commentId));
     }
 
     /**
      * Forwards the action to the comment view on a successful form submission.
      *
-     * @param FormInterface    $form   Form with the error
-     * @param string           $id     Id of the thread
-     * @param CommentInterface $parent Optional comment parent
+     * @param FormInterface $form Form with the error
+     * @param string $id Id of the thread
+     * @param CommentInterface|null $parent Optional comment parent
      *
      * @return View
      */
     protected function onCreateCommentSuccess(FormInterface $form, $id, CommentInterface $parent = null)
     {
-        return View::createRouteRedirect('fos_comment_get_thread_comment', ['id' => $id, 'commentId' => $form->getData()->getId()], Response::HTTP_CREATED);
+        return View::createRouteRedirect(
+            'fos_comment_get_thread_comment',
+            ['id' => $id, 'commentId' => $form->getData()->getId()],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
      * Returns a HTTP_BAD_REQUEST response when the form submission fails.
      *
-     * @param FormInterface    $form   Form with the error
-     * @param string           $id     Id of the thread
-     * @param CommentInterface $parent Optional comment parent
+     * @param FormInterface $form Form with the error
+     * @param string $id Id of the thread
+     * @param CommentInterface|null $parent Optional comment parent
      *
      * @return View
      */
@@ -687,7 +694,11 @@ class ThreadController extends AbstractController
      */
     protected function onCreateThreadSuccess(FormInterface $form)
     {
-        return View::createRouteRedirect('fos_comment_get_thread', ['id' => $form->getData()->getId()], Response::HTTP_CREATED);
+        return View::createRouteRedirect(
+            'fos_comment_get_thread',
+            ['id' => $form->getData()->getId()],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -717,11 +728,14 @@ class ThreadController extends AbstractController
      *
      * @param FormInterface $form
      *
-     * @return View
+     * @return Response
      */
     protected function onCreateThreadErrorDuplicate(FormInterface $form)
     {
-        return new Response(sprintf("Duplicate thread id '%s'.", $form->getData()->getId()), Response::HTTP_BAD_REQUEST);
+        return new Response(
+            sprintf("Duplicate thread id '%s'.", $form->getData()->getId()),
+            Response::HTTP_BAD_REQUEST
+        );
     }
 
     /**
@@ -733,11 +747,14 @@ class ThreadController extends AbstractController
      *
      * @return View
      *
-     * @todo Think about what to show. For now the new score of the comment
      */
     protected function onCreateVoteSuccess(FormInterface $form, $id, $commentId)
     {
-        return View::createRouteRedirect('fos_comment_get_thread_comment_votes', ['id' => $id, 'commentId' => $commentId], Response::HTTP_CREATED);
+        return View::createRouteRedirect(
+            'fos_comment_get_thread_comment_votes',
+            ['id' => $id, 'commentId' => $commentId],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -776,7 +793,11 @@ class ThreadController extends AbstractController
      */
     protected function onEditCommentSuccess(FormInterface $form, $id)
     {
-        return View::createRouteRedirect('fos_comment_get_thread_comment', ['id' => $id, 'commentId' => $form->getData()->getId()], Response::HTTP_CREATED);
+        return View::createRouteRedirect(
+            'fos_comment_get_thread_comment',
+            ['id' => $id, 'commentId' => $form->getData()->getId()],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -812,7 +833,11 @@ class ThreadController extends AbstractController
      */
     protected function onOpenThreadSuccess(FormInterface $form)
     {
-        return View::createRouteRedirect('fos_comment_edit_thread_commentable', ['id' => $form->getData()->getId(), 'value' => !$form->getData()->isCommentable()], Response::HTTP_CREATED);
+        return View::createRouteRedirect(
+            'fos_comment_edit_thread_commentable',
+            ['id' => $form->getData()->getId(), 'value' => !$form->getData()->isCommentable()],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -849,7 +874,11 @@ class ThreadController extends AbstractController
      */
     protected function onRemoveThreadCommentSuccess(FormInterface $form, $id)
     {
-        return View::createRouteRedirect('fos_comment_get_thread_comment', ['id' => $id, 'commentId' => $form->getData()->getId()], Response::HTTP_CREATED);
+        return View::createRouteRedirect(
+            'fos_comment_get_thread_comment',
+            ['id' => $id, 'commentId' => $form->getData()->getId()],
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -881,10 +910,12 @@ class ThreadController extends AbstractController
     /**
      * Checks if a comment belongs to a thread. Returns the comment if it does.
      *
-     * @param ThreadInterface $thread    Thread object
-     * @param mixed           $commentId Id of the comment
+     * @param ThreadInterface $thread Thread object
+     * @param mixed $commentId Id of the comment
      *
      * @return CommentInterface|null The comment
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function getValidCommentParent(ThreadInterface $thread, $commentId)
     {
@@ -900,13 +931,5 @@ class ThreadController extends AbstractController
 
             return $comment;
         }
-    }
-
-    /**
-     * @return \FOS\RestBundle\View\ViewHandler
-     */
-    private function getViewHandler()
-    {
-        return $this->container->get('fos_rest.view_handler');
     }
 }
