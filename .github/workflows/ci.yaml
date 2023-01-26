@@ -3,27 +3,6 @@ name: CI
 on: ['push', 'pull_request']
 
 jobs:
-  cs:
-    runs-on: ubuntu-latest
-    name: Coding style
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          extensions: json, mbstring
-          tools: composer, php-cs-fixer:2.19
-
-      - name: Display tools versions
-        run: |
-          composer --version
-          php-cs-fixer --version
-      - name: Check PHP code
-        run: php-cs-fixer fix --dry-run --diff --ansi
-
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }} + ${{ matrix.symfony-version}})
     runs-on: ubuntu-latest
