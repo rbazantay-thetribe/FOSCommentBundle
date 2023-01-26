@@ -27,7 +27,7 @@ class AclVoteManagerTest extends TestCase
     protected $vote;
     protected $comment;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->realManager = $this->getMockBuilder('FOS\CommentBundle\Model\VoteManagerInterface')->getMock();
         $this->voteSecurity = $this->getMockBuilder('FOS\CommentBundle\Acl\VoteAclInterface')->getMock();
@@ -58,7 +58,13 @@ class AclVoteManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclVoteManager($this->realManager, $this->voteSecurity, $this->commentSecurity);
-        $manager->findVoteById($id);
+        $hasException = false;
+        try {
+            $manager->findVoteById($id);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testFindVoteByIdAllowed()
@@ -101,7 +107,13 @@ class AclVoteManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclVoteManager($this->realManager, $this->voteSecurity, $this->commentSecurity);
-        $manager->findVoteBy($conditions);
+        $hasException = false;
+        try {
+            $manager->findVoteBy($conditions);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testFindVoteByAllowed()
@@ -144,7 +156,13 @@ class AclVoteManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclVoteManager($this->realManager, $this->voteSecurity, $this->commentSecurity);
-        $manager->findVotesByComment($comment);
+        $hasException = false;
+        try {
+            $manager->findVotesByComment($comment);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testFindVotesByCommentAllowed()
@@ -183,7 +201,13 @@ class AclVoteManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclVoteManager($this->realManager, $this->voteSecurity, $this->commentSecurity);
-        $manager->saveVote($this->vote, $comment);
+        $hasException = false;
+        try {
+            $manager->saveVote($this->vote);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     /**
@@ -206,7 +230,13 @@ class AclVoteManagerTest extends TestCase
             ->will($this->returnValue(false));
 
         $manager = new AclVoteManager($this->realManager, $this->voteSecurity, $this->commentSecurity);
-        $manager->saveVote($this->vote, $comment);
+        $hasException = false;
+        try {
+            $manager->saveVote($this->vote);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testAddVote()

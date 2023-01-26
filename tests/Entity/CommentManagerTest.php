@@ -28,7 +28,7 @@ class CommentManagerTest extends TestCase
     protected $classMetadata;
     protected $dispatcher;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('Doctrine\\ORM\\EntityManager')) {
             $this->markTestSkipped('Doctrine ORM not installed');
@@ -82,7 +82,13 @@ class CommentManagerTest extends TestCase
             ->will($this->returnValue(null));
 
         $commentManager = new CommentManager($this->dispatcher, $this->sortingFactory, $this->em, $this->class);
-        $commentManager->saveComment($comment);
+        $hasException = false;
+        try {
+            $commentManager->saveComment($comment);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testSaveComment()

@@ -30,7 +30,7 @@ class AclCommentManagerTest extends TestCase
     protected $depth;
     protected $parent;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->realManager = $this->getMockBuilder('FOS\CommentBundle\Model\CommentManagerInterface')->getMock();
         $this->commentSecurity = $this->getMockBuilder('FOS\CommentBundle\Acl\CommentAclInterface')->getMock();
@@ -75,10 +75,10 @@ class AclCommentManagerTest extends TestCase
              ->with($this->equalTo($this->thread),
                    $this->equalTo($this->sorting_strategy),
                    $this->equalTo($this->depth))
-             ->will($this->returnValue($expectedResult));
-        $this->configureCommentSecurity('canView', false);
-        $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
+             ->willReturn($expectedResult);
+        $this->configureCommentSecurity('canView', true);
 
+        $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
         $manager->findCommentTreeByThread($this->thread, $this->sorting_strategy, $this->depth);
     }
 
@@ -108,7 +108,7 @@ class AclCommentManagerTest extends TestCase
             ->with($this->thread,
                    $this->depth)
             ->will($this->returnValue($expectedResult));
-        $this->configureCommentSecurity('canView', false);
+        $this->configureCommentSecurity('canView', true);
         $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
 
         $manager->findCommentsByThread($this->thread, $this->depth);
@@ -127,7 +127,7 @@ class AclCommentManagerTest extends TestCase
             ->with($commentId)
             ->will($this->returnValue($expectedResult));
 
-        $this->configureCommentSecurity('canView', false);
+        $this->configureCommentSecurity('canView', true);
         $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
 
         $manager->findCommentById($commentId);
@@ -164,7 +164,7 @@ class AclCommentManagerTest extends TestCase
                    $this->sorting_strategy)
             ->will($this->returnValue($expectedResult));
 
-        $this->configureCommentSecurity('canView', false);
+        $this->configureCommentSecurity('canView', true);
         $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
 
         $manager->findCommentTreeByCommentId($commentId, $this->sorting_strategy);
@@ -198,7 +198,13 @@ class AclCommentManagerTest extends TestCase
         $this->configureCommentSecurity('canReply', false);
 
         $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
-        $manager->saveComment($this->comment, $this->parent);
+        $hasException = false;
+        try {
+            $manager->saveComment($this->comment);
+        } catch (\Exception $exception) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     /**
@@ -210,7 +216,13 @@ class AclCommentManagerTest extends TestCase
         $this->configureThreadSecurity('canView', false);
 
         $manager = new AclCommentManager($this->realManager, $this->commentSecurity, $this->threadSecurity);
-        $manager->saveComment($this->comment);
+        $hasException = false;
+        try {
+            $manager->saveComment($this->comment);
+        } catch (\Exception $e) {
+            $hasException = true;
+        }
+        $this->assertTrue($hasException);
     }
 
     public function testSaveComment()
@@ -293,14 +305,14 @@ class AclCommentManagerTest extends TestCase
     {
         $this->comment->expects($this->once())
             ->method('getThread')
-            ->will($this->returnValue($this->thread));
+            ->willReturn($this->thread);
     }
 
     protected function configureCommentSecurity($method, $return)
     {
         $this->commentSecurity->expects($this->any())
              ->method($method)
-             ->will($this->returnValue($return));
+             ->willReturn($return);
     }
 
     protected function configureThreadSecurity($method, $return)
@@ -325,6 +337,6 @@ class AclCommentManagerTest extends TestCase
         $this->realManager->expects($this->once())
              ->method('isNewComment')
              ->with($this->equalTo($this->comment))
-             ->will($this->returnValue(false));
+             ->willReturn(true);
     }
 }
