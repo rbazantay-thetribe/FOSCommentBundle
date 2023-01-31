@@ -19,9 +19,6 @@
             "homepage": "https://github.com/friendsofsymfony/FOSCommentBundle/contributors"
         }
     ],
-    "support": {
-        "issues": "https://github.com/FriendsOfSymfony/FOSCommentBundle/issues"
-    },
     "require": {
         "php": ">=7.4",
         "friendsofsymfony/rest-bundle": "^2.8",
@@ -74,5 +71,10 @@
             "FOS\\CommentBundle\\Tests\\": "tests/"
         }
     },
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "symfony/thanks": true
+        }
+    }
 }
