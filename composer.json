@@ -53,8 +53,7 @@
         "ornicar/akismet-bundle": "dev-master",
         "symfony/expression-language": "^4.3|^5.4",
         "symfony/phpunit-bridge": "^4.3|^5.4",
-        "phpunit/phpunit": "^9.4",
-        "friendsofphp/php-cs-fixer": "^2.2"
+        "phpunit/phpunit": "^9.4"
     },
     "extra": {
         "branch-alias": {
@@ -74,6 +73,7 @@
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
+            "symfony/flex": true,
             "symfony/thanks": true
         }
     }
