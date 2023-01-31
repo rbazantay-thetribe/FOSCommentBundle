@@ -13,16 +13,12 @@ jobs:
       matrix:
         include:
           - php: '7.4'
-            dependencies: 'highest'
             symfony_require: '4.4.*'
           - php: '7.4'
-            dependencies: 'highest'
             symfony_require: '5.4.*'
           - php: '8.1'
-            dependencies: 'highest'
             symfony_require: '4.4.*'
           - php: '8.1'
-            dependencies: 'highest'
             symfony_require: '5.4.*'
       fail-fast: false
     steps:
@@ -39,8 +35,10 @@ jobs:
       - name: Globally install symfony/flex
         run: composer global require --no-progress --no-scripts --no-plugins symfony/flex
 
-      - name: Install Composer dependencies (${{ matrix.dependencies }})
-        run: composer install
+      - name: Install Composer dependencies
+        run: |
+          composer global config --no-plugins allow-plugins.symfony/flex
+          composer install
 
       - name: Run unit tests
         run: |
