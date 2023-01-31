@@ -72,7 +72,6 @@
     },
     "prefer-stable": true,
     "config": {
-        "lock": false,
         "allow-plugins": {
             "symfony/flex": true,
             "symfony/thanks": true

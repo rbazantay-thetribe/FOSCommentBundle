@@ -40,10 +40,7 @@ jobs:
         run: composer global require --no-progress --no-scripts --no-plugins symfony/flex
 
       - name: Install Composer dependencies (${{ matrix.dependencies }})
-        uses: ramsey/composer-install@v2
-        with:
-            dependency-versions: "${{ matrix.dependencies }}"
-            composer-options: "--prefer-dist --prefer-stable"
+        run: composer install --prefer-dist --prefer-stable
 
       - name: Run unit tests
         run: |
