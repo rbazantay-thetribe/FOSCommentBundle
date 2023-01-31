@@ -73,8 +73,8 @@
     "prefer-stable": true,
     "config": {
         "allow-plugins": {
-            "symfony/flex": true,
-            "symfony/thanks": true
+            "symfony/flex": false,
+            "symfony/thanks": false
         }
     }
 }
