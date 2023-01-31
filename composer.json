@@ -19,9 +19,6 @@
             "homepage": "https://github.com/friendsofsymfony/FOSCommentBundle/contributors"
         }
     ],
-    "support": {
-        "issues": "https://github.com/FriendsOfSymfony/FOSCommentBundle/issues"
-    },
     "require": {
         "php": ">=7.4",
         "friendsofsymfony/rest-bundle": "^2.8",
@@ -56,8 +53,7 @@
         "ornicar/akismet-bundle": "dev-master",
         "symfony/expression-language": "^4.3|^5.4",
         "symfony/phpunit-bridge": "^4.3|^5.4",
-        "phpunit/phpunit": "^9.4",
-        "friendsofphp/php-cs-fixer": "^2.2"
+        "phpunit/phpunit": "^9.4"
     },
     "extra": {
         "branch-alias": {
@@ -74,5 +70,11 @@
             "FOS\\CommentBundle\\Tests\\": "tests/"
         }
     },
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": false,
+            "symfony/thanks": false
+        }
+    }
 }
