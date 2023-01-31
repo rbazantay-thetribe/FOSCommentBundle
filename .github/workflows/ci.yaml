@@ -40,7 +40,7 @@ jobs:
         run: composer global require --no-progress --no-scripts --no-plugins symfony/flex
 
       - name: Install Composer dependencies (${{ matrix.dependencies }})
-        run: composer install --prefer-dist --prefer-stable
+        run: composer install
 
       - name: Run unit tests
         run: |
