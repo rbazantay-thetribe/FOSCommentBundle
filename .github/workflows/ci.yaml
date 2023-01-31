@@ -32,9 +32,6 @@ jobs:
           tools: pecl, composer
           extensions: curl, json, mbstring, openssl
 
-      - name: Globally install symfony/flex
-        run: composer global require --no-progress --no-scripts --no-plugins symfony/flex
-
       - name: Install Composer dependencies
         run: |
           composer install
