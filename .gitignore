@@ -6,3 +6,5 @@ Tests/Functional/app/Behat/nginx.conf
 Tests/Functional/web/bundles
 vendor
 .php_cs.cache
+.phpunit.result.cache
+.idea/*
