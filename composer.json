@@ -38,7 +38,6 @@
         "doctrine/annotations": "^1.0"
     },
     "suggest": {
-        "friendsofsymfony/user-bundle": "Allows for user integration.",
         "ornicar/akismet-bundle": "Integrate Akismet for spam detection.",
         "symfony/acl-bundle": "Integrates the ACL Security component.",
         "symfony/assetic-bundle": "Integrates Assetic into Symfony."
