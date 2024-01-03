@@ -29,19 +29,18 @@ class FOSCommentExtension extends Extension
     /**
      * Loads and processes configuration to configure the Container.
      *
-     * @throws InvalidArgumentException
-     *
-     * @param array            $configs
+     * @param array $configs
      * @param ContainerBuilder $container
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         if ('custom' !== $config['db_driver']) {
             $loader->load(sprintf('%s.xml', $config['db_driver']));
@@ -133,7 +132,7 @@ class FOSCommentExtension extends Extension
 
     protected function loadAcl(ContainerBuilder $container, array $config)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('acl.xml');
         $loader->load('commands.xml');
 
