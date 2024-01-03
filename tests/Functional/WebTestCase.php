@@ -69,7 +69,6 @@ class WebTestCase extends BaseWebTestCase
             throw new \LogicException(sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
         }
         $kernel = self::bootKernel($options);
-
         try {
             $client = $kernel->getContainer()->get('test.client');
         } catch (ServiceNotFoundException $e) {

@@ -183,7 +183,7 @@ class ThreadController extends AbstractFOSRestController
         return $this->handleView($view);
     }
 
-    public function getThreadCommentAction(Request $request, string $id, string $commentId): Response
+    public function getThreadCommentAction(Request $request, string $id, ?string $commentId): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
@@ -215,7 +215,7 @@ class ThreadController extends AbstractFOSRestController
         return $this->handleView($view);
     }
 
-    public function removeThreadCommentAction(Request $request, string $id, string $commentId): Response
+    public function removeThreadCommentAction(Request $request, string $id, ?string $commentId): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
@@ -245,7 +245,7 @@ class ThreadController extends AbstractFOSRestController
         return $this->handleView($view);
     }
 
-    public function patchThreadCommentStateAction(Request $request, string $id, string $commentId): Response
+    public function patchThreadCommentStateAction(Request $request, string $id, ?string $commentId): Response
     {
         $manager = $this->container->get('fos_comment.manager.comment');
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
@@ -276,7 +276,7 @@ class ThreadController extends AbstractFOSRestController
      *
      * @return Response
      */
-    public function editThreadCommentAction(Request $request, string $id, string $commentId): Response
+    public function editThreadCommentAction(Request $request, string $id, ?string $commentId): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
@@ -303,7 +303,7 @@ class ThreadController extends AbstractFOSRestController
         return $this->handleView($view);
     }
 
-    public function putThreadCommentsAction(Request $request, string $id, string $commentId): Response
+    public function putThreadCommentsAction(Request $request, string $id, ?string $commentId): Response
     {
         $commentManager = $this->container->get('fos_comment.manager.comment');
 
@@ -443,7 +443,7 @@ class ThreadController extends AbstractFOSRestController
         return $this->handleView($this->onCreateCommentError($form, $id, $parent));
     }
 
-    public function getThreadCommentVotesAction(Request $request, string $id, string $commentId): Response
+    public function getThreadCommentVotesAction(Request $request, string $id, ?string $commentId): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
@@ -467,7 +467,7 @@ class ThreadController extends AbstractFOSRestController
     }
 
 
-    public function newThreadCommentVotesAction(Request $request, string $id, string $commentId): Response
+    public function newThreadCommentVotesAction(Request $request, string $id, ?string $commentId): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
@@ -499,7 +499,7 @@ class ThreadController extends AbstractFOSRestController
     }
 
 
-    public function postThreadCommentVotesAction(Request $request, string $id, string $commentId): Response
+    public function postThreadCommentVotesAction(Request $request, string $id, ?string $commentId): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
@@ -587,7 +587,7 @@ class ThreadController extends AbstractFOSRestController
         );
     }
 
-    protected function onCreateVoteSuccess(FormInterface $form, string $id, string $commentId): View
+    protected function onCreateVoteSuccess(FormInterface $form, string $id, ?string $commentId): View
     {
         return View::createRouteRedirect(
             'fos_comment_get_thread_comment_votes',
@@ -596,7 +596,7 @@ class ThreadController extends AbstractFOSRestController
         );
     }
 
-    protected function onCreateVoteError(FormInterface $form, string $id, string $commentId): View
+    protected function onCreateVoteError(FormInterface $form, string $id, ?string $commentId): View
     {
         return View::create()
             ->setStatusCode(Response::HTTP_BAD_REQUEST)
@@ -689,7 +689,7 @@ class ThreadController extends AbstractFOSRestController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    private function getValidCommentParent(ThreadInterface $thread, string $commentId): ?CommentInterface
+    private function getValidCommentParent(ThreadInterface $thread, ?string $commentId): ?CommentInterface
     {
         if (null !== $commentId) {
             $comment = $this->container->get('fos_comment.manager.comment')->findCommentById($commentId);
