@@ -15,6 +15,7 @@ use FOS\CommentBundle\Model\CommentInterface;
 use FOS\CommentBundle\Model\ThreadInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
+use FOS\RestBundle\View\ViewHandlerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Form\FormInterface;
@@ -704,5 +705,14 @@ class ThreadController extends AbstractFOSRestController
             return $comment;
         }
         return null;
+    }
+
+    protected function getViewHandler(): ViewHandlerInterface
+    {
+        $viewHandler = parent::getViewHandler();
+        $viewHandler->registerHandler('html', function($element, View $view, $request, $format) {
+            return $view->getResponse();
+        });
+        return $viewHandler;
     }
 }
