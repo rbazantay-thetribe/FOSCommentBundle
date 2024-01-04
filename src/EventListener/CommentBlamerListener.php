@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class CommentBlamerListener implements EventSubscriberInterface
 {
     /**
-     * @var LoggerInterface
+     * @var ?LoggerInterface
      */
     protected $logger;
     /**
@@ -40,15 +40,11 @@ class CommentBlamerListener implements EventSubscriberInterface
      */
     private $tokenStorage;
 
-    /**
-     * Constructor.
-     *
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface         $tokenStorage
-     * @param LoggerInterface               $logger
-     */
-    public function __construct(AuthorizationCheckerInterface $authorizationChecker, TokenStorageInterface $tokenStorage, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        AuthorizationCheckerInterface $authorizationChecker,
+        TokenStorageInterface $tokenStorage,
+        LoggerInterface $logger = null
+    ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
@@ -57,7 +53,7 @@ class CommentBlamerListener implements EventSubscriberInterface
     /**
      * Assigns the currently logged in user to a Comment.
      *
-     * @param \FOS\CommentBundle\Event\CommentEvent $event
+     * @param CommentEvent $event
      */
     public function blame(CommentEvent $event)
     {
@@ -87,7 +83,7 @@ class CommentBlamerListener implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [Events::COMMENT_PRE_PERSIST => 'blame'];
     }

@@ -70,6 +70,7 @@ class AppKernel extends Kernel
             throw new \RuntimeException(sprintf('The bundles file "%s" does not exist.', $filename));
         }
         $contents = require $this->getRootDir().'/'.$this->testCase.'/bundles.php';
+
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
                 yield new $class();
@@ -99,23 +100,21 @@ class AppKernel extends Kernel
 
     public function getCacheDir(): string
     {
-        return sys_get_temp_dir().'/'.time().'/'.Kernel::VERSION.'/'.$this->testCase.'/cache/'.$this->environment;
+        return $this->getProjectDir().'/data/'.Kernel::VERSION.'/'.$this->testCase.'/cache/'.$this->environment;
     }
 
     public function getLogDir(): string
     {
-        return sys_get_temp_dir().'/'.time().'/'.Kernel::VERSION.'/'.$this->testCase.'/logs';
+        return $this->getProjectDir().'/data/'.Kernel::VERSION.'/'.$this->testCase.'/logs';
     }
 
     public function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
         $container->addResource(new FileResource($this->getRootDir().'/'.$this->testCase.'/bundles.php'));
-        $container->setParameter('container.dumper.inline_class_loader', \PHP_VERSION_ID < 70400 || $this->debug);
+        $container->setParameter('container.dumper.inline_class_loader', $this->debug);
         $container->setParameter('container.dumper.inline_factories', true);
         $loader->load($this->getRootDir().'/'.$this->testCase. '/config' . self::CONFIG_EXTS, 'glob');
-        if (Kernel::MAJOR_VERSION >= 4 && Kernel::MINOR_VERSION >= 1) {
-            $loader->load(__DIR__.'/config/twig.yml');
-        }
+        $loader->load(__DIR__.'/config/*'. self::CONFIG_EXTS, 'glob');
     }
 
     public function serialize()

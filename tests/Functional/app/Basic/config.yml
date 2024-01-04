@@ -11,6 +11,19 @@ fos_comment:
             vote: FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\Entity\Vote
 
 fos_rest:
+    routing_loader: false
+    view:
+        view_response_listener: 'force'
     format_listener:
+        enabled: true
         rules:
             - { path: '^/comments', priorities: ['json', 'html'], fallback_format: json }
+            - { path: '^/', priorities: [ 'html', 'json' ], fallback_format: json, prefer_extension: true }
+
+handcraftedinthealps_rest_routing:
+    routing_loader:
+        default_format: 'json'
+        formats:
+            json: true
+            xml: true
+            html: true

@@ -15,6 +15,7 @@ return [
     \Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
     \Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
     \FOS\RestBundle\FOSRestBundle::class => ['all' => true],
+    \HandcraftedInTheAlps\RestRoutingBundle\RestRoutingBundle::class => ['all' => true],
     \FOS\CommentBundle\FOSCommentBundle::class => ['all' => true],
     \JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
     \FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\CommentBundle::class => ['all' => true]

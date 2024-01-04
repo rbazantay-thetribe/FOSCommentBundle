@@ -1,8 +1,9 @@
-comment_test:
+_commenttest:
     resource: "@CommentBundle/Resources/config/routing.yml"
 
-#fos_comment_api:
-#    type: rest
-#    resource: "@FOSCommentBundle/Resources/config/routing.yml"
-#    prefix: /comment_api
+FOSComentBundle:
+    type: rest
+    resource: "@FOSCommentBundle/Resources/routes/routing.yml"
+    prefix: /comment_api
+    defaults: { _format: html }
 
