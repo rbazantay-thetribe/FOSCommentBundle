@@ -18,117 +18,67 @@ use FOS\CommentBundle\Model\ThreadInterface;
 use FOS\CommentBundle\Model\VotableCommentInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="test_comment")
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- *
- * @author Tim Nagel <tim@nagel.com.au>
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_comment')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Comment extends BaseComment implements SignedCommentInterface, VotableCommentInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
-    /**
-     * Thread of this comment.
-     *
-     * @ORM\ManyToOne(targetEntity="Thread")
-     *
-     * @var Thread
-     */
+
+    #[ORM\ManyToOne(targetEntity: Thread::class)]
     protected $thread;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     *
-     * @var string
-     */
+
+    #[ORM\Column(type: 'string', nullable: true)]
     protected $author;
 
-    /**
-     * @ORM\Column(type="integer")
-     *
-     * @var int
-     */
+
+    #[ORM\Column(type: 'integer')]
     protected $score = 0;
 
-    /**
-     * @return Thread
-     */
-    public function getThread()
+
+    public function getThread(): Thread
     {
         return $this->thread;
     }
 
-    /**
-     * @param Thread $thread
-     *
-     * @return null
-     */
-    public function setThread(ThreadInterface $thread)
+    public function setThread(ThreadInterface $thread): void
     {
         $this->thread = $thread;
     }
 
-    /**
-     * Sets the author of the Comment.
-     *
-     * @param string $user
-     */
-    public function setAuthor(UserInterface $author)
+
+    public function setAuthor(UserInterface $author): void
     {
-        $this->author = $author->getUsername();
+        $this->author = method_exists($author, 'getUsername') ? $author->getUsername() : $author->getUserIdentifier();
+
     }
 
-    /**
-     * Gets the author of the Comment.
-     *
-     * @return string
-     */
-    public function getAuthor()
+    public function getAuthor(): ?string
     {
         return $this->author;
     }
 
-    /**
-     * Sets the score of the comment.
-     *
-     * @param int $score
-     */
-    public function setScore($score)
+    public function setScore($score): void
     {
         $this->score = $score;
     }
 
-    /**
-     * Returns the current score of the comment.
-     *
-     * @return int
-     */
-    public function getScore()
+    public function getScore(): int
     {
         return $this->score;
     }
 
-    /**
-     * Increments the comment score by the provided
-     * value.
-     *
-     * @param int value
-     *
-     * @return int The new comment score
-     */
-    public function incrementScore($by = 1)
+    public function incrementScore($by = 1): void
     {
         $this->score += $by;
     }
 
-    public function getAuthorName()
+    public function getAuthorName(): string
     {
         return $this->author ?: parent::getAuthorName();
     }

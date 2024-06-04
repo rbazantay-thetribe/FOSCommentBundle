@@ -3,7 +3,7 @@ framework:
     test: ~
     session:
         handler_id: ~
-        storage_id: session.storage.mock_file
+        storage_factory_id: session.storage.factory.mock_file
         name: MOCKSESSID
     form:            true
     csrf_protection: false
@@ -23,10 +23,8 @@ doctrine:
     orm:
         default_entity_manager: default
         auto_generate_proxy_classes: "%kernel.debug%"
-        entity_managers:
-            default:
-                naming_strategy: doctrine.orm.naming_strategy.underscore
-                auto_mapping: true
+        auto_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.default
 
 security:
     providers:
@@ -36,8 +34,9 @@ security:
                     admin: { password: admin, roles: [ROLE_SUPER_ADMIN] }
                     user: { password: user, roles: [ROLE_USER] }
 
-    encoders:
+    password_hashers:
         Symfony\Component\Security\Core\User\User: plaintext
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
     firewalls:
         main:
@@ -47,7 +46,6 @@ security:
                 provider: memory
                 realm: "FOSCommentBundle Test Suite"
             logout:       true
-            anonymous:    true
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER

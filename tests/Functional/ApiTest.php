@@ -130,7 +130,6 @@ class ApiTest extends WebTestCase
     public function testAddCommentToThread($id)
     {
         $crawler = $this->client->request('GET', "/comment_api/threads/{$id}/comments/new.html");
-
         $form = $crawler->selectButton('fos_comment_comment_new_submit')->form();
         $form['fos_comment_comment[body]'] = 'Test Comment';
         $this->client->submit($form);

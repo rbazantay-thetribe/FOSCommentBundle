@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
 
 if (method_exists(Security::class, 'getUser') && !class_exists(UserValueResolver::class)) {

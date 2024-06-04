@@ -11,24 +11,26 @@
 
 namespace FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Test controller used in the functional tests for CommentBundle.
  *
  * @author Tim Nagel <tim@nagel.com.au>
  */
-class CommentController extends Controller
+class CommentController extends AbstractController
 {
-    public function asyncAction($id)
+    public function asyncAction($id): Response
     {
         return $this->render('CommentBundle:Comment:async.html.twig', [
             'id' => $id,
         ]);
     }
 
-    public function inlineAction(Request $request, $id)
+    public function inlineAction(Request $request, $id): Response
     {
         $thread = $this->container->get('fos_comment.manager.thread')->findThreadById($id);
         if (null === $thread) {

@@ -11,6 +11,7 @@
 
 namespace FOS\CommentBundle\Tests\Functional;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -29,16 +30,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class WebTestCase extends BaseWebTestCase
 {
     use WebTestAssertionsTrait;
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
-    protected static $schemaSetUp = false;
 
-    /**
-     * @var AbstractBrowser
-     */
-    protected $client;
+    protected ?ObjectManager $em = null;
+    protected static bool $schemaSetUp = false;
+    protected ?AbstractBrowser $client = null;
 
     protected function setUp(): void
     {
@@ -83,20 +78,6 @@ class WebTestCase extends BaseWebTestCase
         return $client;
     }
 
-    protected static function bootKernel(array $options = []): KernelInterface
-    {
-        static::ensureKernelShutdown();
-
-        $kernel = static::createKernel($options);
-        $kernel->boot();
-        static::$kernel = $kernel;
-        static::$booted = true;
-
-        $container = static::$kernel->getContainer();
-        static::$container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
-
-        return static::$kernel;
-    }
     protected static function createKernel(array $options = []): KernelInterface
     {
 
