@@ -11,42 +11,21 @@
 
 namespace FOS\CommentBundle\Tests\Functional;
 
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-$dir = __DIR__;
-$lastDir = null;
-while ($dir !== $lastDir) {
-    $lastDir = $dir;
-
-    if (file_exists($dir.'/autoload.php')) {
-        require_once $dir.'/autoload.php';
-        break;
-    }
-
-    if (file_exists($dir.'/autoload.php.dist')) {
-        require_once $dir.'/autoload.php.dist';
-        break;
-    }
-
-    if (file_exists($dir.'/vendor/autoload.php')) {
-        require_once $dir.'/vendor/autoload.php';
-        break;
-    }
-
-    $dir = dirname($dir);
-}
 class AppKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    private const CONFIG_EXTS = '.{php,xml,yaml,yml}';
-    private $testCase;
-    private $rootConfig;
+    private const CONFIG_EXITS = '.{php,xml,yaml,yml}';
+    private ?string $testCase;
+    private ?string $rootConfig;
 
     public function __construct(
         $environment,
@@ -54,13 +33,12 @@ class AppKernel extends Kernel
         $testCase = 'Basic',
         $rootConfig = 'config.yml"'
     ) {
-        $root = strpos(__DIR__, '/app') !== false ? __DIR__ : __DIR__ . '/app';
+        $root = str_contains(__DIR__, '/app') ? __DIR__ : __DIR__ . '/app';
         if (!is_dir($root.'/'.$testCase)) {
             throw new \InvalidArgumentException(sprintf('The test case "%s" does not exist.', $testCase));
         }
         $this->testCase = $testCase;
         $this->rootConfig = $root.'/'.$testCase.'/'.$rootConfig;
-
         parent::__construct($environment, $debug);
     }
 
@@ -78,12 +56,10 @@ class AppKernel extends Kernel
         }
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes): void
+    private function configureRoutes(RoutingConfigurator $routes): void
     {
         $confDir = $this->getProjectDir() . '/' . $this->testCase;
-        $routes->import($confDir . '/{routing}' . self::CONFIG_EXTS, '/', 'glob');
-
-      //  dd($routes);
+        $routes->import($confDir . '/{routing}' . self::CONFIG_EXITS);$routes->import($confDir.'/{routes}/'.$this->environment.'/*.{php,yaml}');
     }
 
     public function getProjectDir(): string
@@ -108,21 +84,23 @@ class AppKernel extends Kernel
         return $this->getProjectDir().'/data/'.Kernel::VERSION.'/'.$this->testCase.'/logs';
     }
 
-    public function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
-    {
+    /**
+     * @throws Exception
+     */
+    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void    {
         $container->addResource(new FileResource($this->getRootDir().'/'.$this->testCase.'/bundles.php'));
         $container->setParameter('container.dumper.inline_class_loader', $this->debug);
         $container->setParameter('container.dumper.inline_factories', true);
-        $loader->load($this->getRootDir().'/'.$this->testCase. '/config' . self::CONFIG_EXTS, 'glob');
-        $loader->load(__DIR__.'/config/*'. self::CONFIG_EXTS, 'glob');
+        $loader->load($this->getRootDir().'/'.$this->testCase. '/config' . self::CONFIG_EXITS, 'glob');
+        $loader->load($this->getRootDir().'/config/'. self::CONFIG_EXITS, 'glob');
     }
 
-    public function serialize()
+    public function serialize(): string
     {
         return serialize([$this->testCase, $this->rootConfig, $this->getEnvironment(), $this->isDebug()]);
     }
 
-    public function unserialize($str)
+    public function unserialize($str): void
     {
         call_user_func_array([$this, '__construct'], unserialize($str));
     }

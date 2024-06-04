@@ -14,29 +14,21 @@ namespace FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\CommentBundle\Entity\Thread as BaseThread;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="test_thread")
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- *
- * @author Tim Nagel <tim@nagel.com.au>
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_thread')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Thread extends BaseThread
 {
-    /**
-     * @var string
-     *
-     * @ORM\Id
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'string')]
     protected $id;
 
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }

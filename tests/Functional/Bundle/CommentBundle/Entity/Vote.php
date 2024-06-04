@@ -16,43 +16,29 @@ use FOS\CommentBundle\Entity\Vote as BaseVote;
 use FOS\CommentBundle\Model\SignedVoteInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="test_vote")
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'test_vote')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Vote extends BaseVote implements SignedVoteInterface
 {
-    /**
-     * @var int
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     protected $id;
 
-    /**
-     * @var string
-     * @ORM\Column(type="string")
-     */
+
+    #[ORM\Column(type: 'string')]
     protected $voter;
 
-    /**
-     * Sets the owner of the vote.
-     *
-     * @param string $user
-     */
-    public function setVoter(UserInterface $voter)
+
+    public function setVoter(UserInterface $voter): void
     {
-        $this->voter = $voter->getUsername();
+        $this->voter = method_exists($voter, 'getUsername') ? $voter->getUsername() : $voter->getUserIdentifier();
     }
 
-    /**
-     * Gets the owner of the vote.
-     *
-     * @return UserInterface
-     */
-    public function getVoter()
+
+    public function getVoter(): UserInterface
     {
         return $this->voter;
     }

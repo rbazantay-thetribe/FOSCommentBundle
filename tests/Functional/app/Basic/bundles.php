@@ -9,14 +9,24 @@
  * with this source code in the file LICENSE.
  */
 
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use FOS\CommentBundle\FOSCommentBundle;
+use FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\CommentBundle;
+use FOS\RestBundle\FOSRestBundle;
+use HandcraftedInTheAlps\RestRoutingBundle\RestRoutingBundle;
+use JMS\SerializerBundle\JMSSerializerBundle;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
+
 return [
-    \Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
-    \Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
-    \Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
-    \Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
-    \FOS\RestBundle\FOSRestBundle::class => ['all' => true],
-    \HandcraftedInTheAlps\RestRoutingBundle\RestRoutingBundle::class => ['all' => true],
-    \FOS\CommentBundle\FOSCommentBundle::class => ['all' => true],
-    \JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
-    \FOS\CommentBundle\Tests\Functional\Bundle\CommentBundle\CommentBundle::class => ['all' => true]
+    FrameworkBundle::class => ['all' => true],
+    SecurityBundle::class => ['all' => true],
+    TwigBundle::class => ['all' => true],
+    DoctrineBundle::class => ['all' => true],
+    FOSRestBundle::class => ['all' => true],
+    RestRoutingBundle::class => ['all' => true],
+    FOSCommentBundle::class => ['all' => true],
+    JMSSerializerBundle::class => ['all' => true],
+    CommentBundle::class => ['all' => true]
 ];
