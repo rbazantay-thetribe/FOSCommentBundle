@@ -1,5 +1,5 @@
 {
-    "name": "boostworld/comment-bundle",
+    "name": "tribe/comment-bundle",
     "type": "symfony-bundle",
     "description": "This Bundle provides threaded comment functionality for Symfony applications - Fork for PHP8",
     "keywords": ["comment", "threads", "forum"],
